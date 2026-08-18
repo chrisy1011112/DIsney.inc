@@ -3,13 +3,263 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>✨ Disney API · Roblox Ready</title>
+    <title>✨ Disney Magic · Roblox API</title>
+
+    <!-- ============================================================ -->
+    <!--  ★ MAINTENANCE SETTINGS (EDIT THESE FIRST) ★                 -->
+    <!--  All maintenance controls are at the VERY TOP of the HTML    -->
+    <!--  for quick access. Just scroll up!                           -->
+    <!-- ============================================================ -->
+    <style>
+        /* ----- MAINTENANCE OVERLAY (full-screen) ----- */
+        #maintenance-overlay {
+            display: none;  /* CHANGE TO 'flex' TO ENABLE MAINTENANCE MODE MANUALLY */
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(10, 15, 30, 0.92);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem;
+            animation: fadeOverlay 0.6s ease;
+        }
+
+        #maintenance-overlay.active {
+            display: flex;  /* KEEP THIS AS 'flex' — DO NOT CHANGE */
+        }
+
+        @keyframes fadeOverlay {
+            0% { opacity: 0; transform: scale(0.96); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        #maintenance-overlay .maintenance-icon {
+            font-size: 5rem;
+            color: #f5c542;
+            margin-bottom: 1rem;
+            animation: spin-slow 8s infinite linear;
+        }
+
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #maintenance-overlay h2 {
+            font-family: 'Waltograph', 'Segoe UI', cursive;
+            font-size: 3.5rem;
+            color: #f5dbb0;
+            text-shadow: 0 0 40px rgba(245, 197, 66, 0.1);
+            margin-bottom: 0.3rem;
+        }
+
+        #maintenance-overlay p {
+            color: #b8c4e0;
+            font-size: 1.2rem;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        #maintenance-overlay .eta {
+            margin-top: 1.5rem;
+            font-family: 'Courier New', monospace;
+            color: #5d6f92;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.4rem 1.8rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255,215,0,0.04);
+        }
+
+        /* ----- SETTINGS BAR (sticky, at top of page) ----- */
+        #site-settings {
+            position: sticky;
+            top: 0;
+            z-index: 9998;
+            background: rgba(10, 15, 30, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.15);
+            padding: 0.5rem 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem 1.2rem;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+
+        #site-settings .settings-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        #site-settings .settings-left i {
+            color: #f5c542;
+            font-size: 1.1rem;
+        }
+
+        #site-settings .settings-left .label {
+            color: #8a9bbd;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        #site-settings .settings-left .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem 0.8rem;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.04);
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255,215,0,0.04);
+        }
+
+        #site-settings .settings-left .setting-group .toggle-label {
+            color: #b8c4e0;
+            font-size: 0.75rem;
+            font-weight: 400;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: #2a3a5a;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255,215,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: #f5c542;
+            border-color: #f5c542;
+        }
+
+        .toggle-switch .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            left: 20px;
+            background: #0b1a3a;
+        }
+
+        #site-settings .settings-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        #site-settings .settings-right .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        .status-badge.online {
+            background: rgba(76, 175, 80, 0.15);
+            color: #81c784;
+            border: 1px solid rgba(76, 175, 80, 0.15);
+        }
+
+        .status-badge.maintenance {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffd54f;
+            border: 1px solid rgba(255, 193, 7, 0.15);
+            animation: pulse-status 1.8s infinite;
+        }
+
+        @keyframes pulse-status {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-badge i {
+            font-size: 0.6rem;
+        }
+
+        #site-settings .settings-right .api-url {
+            font-family: 'Courier New', monospace;
+            font-size: 0.65rem;
+            color: #5d6f92;
+            background: rgba(0,0,0,0.2);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.02);
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* when maintenance is active, dim the main app */
+        .disney-app.maintenance-mode {
+            opacity: 0.2;
+            pointer-events: none;
+            user-select: none;
+            transition: 0.5s;
+        }
+
+        /* responsive settings */
+        @media (max-width: 680px) {
+            #site-settings {
+                padding: 0.4rem 1rem;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.4rem;
+            }
+            #site-settings .settings-left {
+                justify-content: center;
+            }
+            #site-settings .settings-right {
+                justify-content: center;
+            }
+            #site-settings .settings-right .api-url {
+                max-width: 180px;
+                font-size: 0.55rem;
+            }
+            #maintenance-overlay h2 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+    <!-- ============================================================ -->
+    <!--  ★ END MAINTENANCE SETTINGS ★                                -->
+    <!-- ============================================================ -->
+
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Waltograph Font (personal use only) -->
     <link href="https://fonts.cdnfonts.com/css/waltograph" rel="stylesheet" />
+
     <style>
-        /* ----- Reset & base (advanced glassmorphism + animations) ----- */
+        /* ----- Reset & base ----- */
         * {
             margin: 0;
             padding: 0;
@@ -63,7 +313,7 @@
             border: 1px solid rgba(255, 215, 0, 0.08);
             position: relative;
             z-index: 2;
-            transition: 0.3s;
+            transition: 0.4s;
         }
 
         /* Waltograph typography */
@@ -295,7 +545,7 @@
             color: #f5e3c6;
         }
 
-        /* ----- API SECTION (Roblox integration) ----- */
+        /* API SECTION */
         .api-section {
             margin: 2.5rem 0 1.2rem;
             padding: 2rem 2.5rem;
@@ -316,6 +566,7 @@
             align-items: center;
             gap: 1.2rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .api-header i {
@@ -533,7 +784,56 @@
     </style>
 </head>
 <body>
-<div class="disney-app">
+
+<!-- ============================================================ -->
+<!--  ★ MAINTENANCE OVERLAY (HTML) ★                              -->
+<!--  Edit this section to change the maintenance message         -->
+<!-- ============================================================ -->
+<div id="maintenance-overlay" class="active">
+    <div class="maintenance-icon"><i class="fas fa-tools"></i></div>
+    <h2>✨ Under Maintenance</h2>
+    <p>We're sprinkling a little extra magic on the site. Please check back soon!</p>
+    <div class="eta"><i class="fas fa-clock"></i> Expected back: <span id="maintenance-eta">soon</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!--  ★ SETTINGS BAR (HTML) ★                                    -->
+<!--  This is the sticky bar at the very top of the page          -->
+<!-- ============================================================ -->
+<div id="site-settings">
+    <div class="settings-left">
+        <i class="fas fa-cog"></i>
+        <span class="label">Site Settings</span>
+
+        <div class="setting-group">
+            <span class="toggle-label"><i class="fas fa-wrench"></i> Maintenance</span>
+            <div class="toggle-switch active" id="maintenanceToggle" onclick="toggleMaintenance()">
+                <div class="toggle-knob"></div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="toggle-label"><i class="fas fa-eye"></i> Debug</span>
+            <div class="toggle-switch" id="debugToggle" onclick="toggleDebug()">
+                <div class="toggle-knob"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-right">
+        <span class="status-badge maintenance" id="statusBadge">
+            <i class="fas fa-circle"></i> Maintenance
+        </span>
+        <span class="api-url" id="apiUrlDisplay">
+            <i class="fas fa-link"></i> https://chrisy1011112.github.io/DIsney.inc/
+        </span>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  MAIN DISNEY APP                                             -->
+<!-- ============================================================ -->
+<div class="disney-app maintenance-mode">
 
     <!-- header -->
     <h1 class="main-title">
@@ -609,7 +909,6 @@
             <h2>API · Roblox Ready</h2>
         </div>
 
-        <!-- API Section -->
         <div class="api-section">
             <div class="api-header">
                 <i class="fas fa-robot"></i>
@@ -620,7 +919,6 @@
             </div>
 
             <div class="api-endpoints">
-                <!-- Endpoint 1: Movies -->
                 <div class="endpoint-card">
                     <span class="method">GET</span>
                     <div class="url">/api/movies</div>
@@ -634,7 +932,6 @@
                     <button class="copy-btn" onclick="copyCode('moviesCode')"><i class="fas fa-copy"></i> Copy</button>
                 </div>
 
-                <!-- Endpoint 2: Characters -->
                 <div class="endpoint-card">
                     <span class="method">GET</span>
                     <div class="url">/api/characters</div>
@@ -648,7 +945,6 @@
                     <button class="copy-btn" onclick="copyCode('charactersCode')"><i class="fas fa-copy"></i> Copy</button>
                 </div>
 
-                <!-- Endpoint 3: Magic Counter -->
                 <div class="endpoint-card">
                     <span class="method">GET / POST</span>
                     <div class="url">/api/magic</div>
@@ -702,7 +998,9 @@ end
     </div>
 </div>
 
-<!-- ========== JAVASCRIPT ========== -->
+<!-- ============================================================ -->
+<!--  JAVASCRIPT                                                   -->
+<!-- ============================================================ -->
 <script>
     (function() {
         // ---- DATA ----
@@ -757,7 +1055,6 @@ end
         window.copyCode = function(elementId) {
             const element = document.getElementById(elementId);
             if (!element) return;
-            
             const text = element.textContent || element.innerText;
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -816,17 +1113,77 @@ end
 
         if (!pages.home.classList.contains('active-page')) showPage('home');
 
-        // ---- SIMULATED API (so Roblox can actually fetch data) ----
-        // This intercepts the /api/* routes and returns JSON
-        // When deployed, you'll need a backend or use a static JSON file approach
-        // For GitHub Pages, you can create .json files in an /api/ folder
+        // ---- SETTINGS: MAINTENANCE TOGGLE ----
+        let maintenanceMode = true; // STARTS IN MAINTENANCE MODE (set to false to start online)
+        const maintenanceToggle = document.getElementById('maintenanceToggle');
+        const maintenanceOverlay = document.getElementById('maintenance-overlay');
+        const statusBadge = document.getElementById('statusBadge');
+        const appContainer = document.querySelector('.disney-app');
+
+        window.toggleMaintenance = function() {
+            maintenanceMode = !maintenanceMode;
+            maintenanceToggle.classList.toggle('active', maintenanceMode);
+            if (maintenanceMode) {
+                maintenanceOverlay.classList.add('active');
+                statusBadge.className = 'status-badge maintenance';
+                statusBadge.innerHTML = '<i class="fas fa-circle"></i> Maintenance';
+                appContainer.classList.add('maintenance-mode');
+                // set ETA
+                const eta = document.getElementById('maintenance-eta');
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 15);
+                eta.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                maintenanceOverlay.classList.remove('active');
+                statusBadge.className = 'status-badge online';
+                statusBadge.innerHTML = '<i class="fas fa-circle"></i> Online';
+                appContainer.classList.remove('maintenance-mode');
+            }
+        };
+
+        // ---- SETTINGS: DEBUG TOGGLE ----
+        let debugMode = false;
+        const debugToggle = document.getElementById('debugToggle');
+
+        window.toggleDebug = function() {
+            debugMode = !debugMode;
+            debugToggle.classList.toggle('active', debugMode);
+            if (debugMode) {
+                console.log('🐞 Debug mode ENABLED — showing extra logs');
+                console.log('📦 Movies data:', movies);
+                console.log('👥 Characters data:', characters);
+                alert('🐞 Debug mode enabled! Check the browser console for data.');
+            } else {
+                console.log('🐞 Debug mode disabled');
+            }
+        };
+
+        // ---- SIMULATED API ----
         console.log('✨ Disney API ready for Roblox!');
         console.log('📡 Endpoints:');
         console.log('  /api/movies      - GET all movies');
         console.log('  /api/characters  - GET all characters');
         console.log('  /api/magic       - GET/POST magic counter');
         console.log('🔗 Use your GitHub Pages URL in Roblox HttpService');
+
+        // ---- UPDATE API URL DISPLAY ----
+        const apiUrlDisplay = document.getElementById('apiUrlDisplay');
+        if (apiUrlDisplay) {
+            const currentUrl = window.location.href.split('?')[0];
+            apiUrlDisplay.innerHTML = `<i class="fas fa-link"></i> ${currentUrl}`;
+        }
+
+        // ---- INITIAL MAINTENANCE STATE ----
+        // Since we start in maintenance mode, set the ETA
+        const eta = document.getElementById('maintenance-eta');
+        if (eta && maintenanceMode) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 15);
+            eta.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
     })();
 </script>
+
 </body>
 </html>
