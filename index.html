@@ -8,12 +8,11 @@
     <!-- ============================================================ -->
     <!--  ★ MAINTENANCE SETTINGS (EDIT THESE FIRST) ★                 -->
     <!--  All maintenance controls are at the VERY TOP of the HTML    -->
-    <!--  for quick access. Just scroll up!                           -->
     <!-- ============================================================ -->
     <style>
         /* ----- MAINTENANCE OVERLAY (full-screen) ----- */
         #maintenance-overlay {
-            display: none;  /* CHANGE TO 'flex' TO ENABLE MAINTENANCE MODE MANUALLY */
+            display: none;
             position: fixed;
             inset: 0;
             z-index: 99999;
@@ -29,7 +28,7 @@
         }
 
         #maintenance-overlay.active {
-            display: flex;  /* KEEP THIS AS 'flex' — DO NOT CHANGE */
+            display: flex;
         }
 
         @keyframes fadeOverlay {
@@ -92,6 +91,7 @@
             gap: 0.5rem 1.2rem;
             font-family: 'Segoe UI', system-ui, sans-serif;
             box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            transition: 0.3s;
         }
 
         #site-settings .settings-left {
@@ -165,6 +165,95 @@
             background: #0b1a3a;
         }
 
+        /* ----- AUTH OVERLAY (for settings access) ----- */
+        #auth-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99997;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        #auth-overlay.active {
+            display: flex;
+        }
+
+        #auth-overlay .auth-box {
+            background: rgba(20, 30, 60, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 3rem 2.5rem;
+            max-width: 420px;
+            width: 100%;
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            box-shadow: 0 40px 70px rgba(0,0,0,0.6);
+            text-align: center;
+        }
+
+        #auth-overlay .auth-box h3 {
+            font-family: 'Waltograph', cursive;
+            font-size: 2.2rem;
+            color: #f5dbb0;
+            margin-bottom: 0.2rem;
+        }
+
+        #auth-overlay .auth-box p {
+            color: #8a9bbd;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #auth-overlay .auth-box input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            background: rgba(0,0,0,0.3);
+            color: #f5e3c6;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            margin-bottom: 0.8rem;
+        }
+
+        #auth-overlay .auth-box input:focus {
+            border-color: #f5c542;
+            box-shadow: 0 0 30px rgba(245, 197, 66, 0.05);
+        }
+
+        #auth-overlay .auth-box .auth-btn {
+            background: linear-gradient(135deg, #f5c542, #d99f2b);
+            color: #0b1a3a;
+            border: none;
+            padding: 0.7rem 2.5rem;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        #auth-overlay .auth-box .auth-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(245, 197, 66, 0.15);
+        }
+
+        #auth-overlay .auth-box .error-msg {
+            color: #ff6b6b;
+            font-size: 0.8rem;
+            margin-top: 0.6rem;
+            display: none;
+        }
+
+        #auth-overlay .auth-box .error-msg.show {
+            display: block;
+        }
+
         #site-settings .settings-right {
             display: flex;
             align-items: center;
@@ -218,12 +307,23 @@
             white-space: nowrap;
         }
 
+        #site-settings .settings-right .lock-icon {
+            color: #f5c542;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
         /* when maintenance is active, dim the main app */
         .disney-app.maintenance-mode {
             opacity: 0.2;
             pointer-events: none;
             user-select: none;
             transition: 0.5s;
+        }
+
+        /* hide settings toggles from non-authorized users */
+        .settings-left .setting-group.hidden {
+            display: none;
         }
 
         /* responsive settings */
@@ -246,6 +346,9 @@
             }
             #maintenance-overlay h2 {
                 font-size: 2.2rem;
+            }
+            #auth-overlay .auth-box {
+                padding: 2rem 1.5rem;
             }
         }
     </style>
@@ -787,9 +890,8 @@
 
 <!-- ============================================================ -->
 <!--  ★ MAINTENANCE OVERLAY (HTML) ★                              -->
-<!--  Edit this section to change the maintenance message         -->
 <!-- ============================================================ -->
-<div id="maintenance-overlay" class="active">
+<div id="maintenance-overlay">
     <div class="maintenance-icon"><i class="fas fa-tools"></i></div>
     <h2>✨ Under Maintenance</h2>
     <p>We're sprinkling a little extra magic on the site. Please check back soon!</p>
@@ -797,22 +899,34 @@
 </div>
 
 <!-- ============================================================ -->
+<!--  ★ AUTH OVERLAY (for settings access) ★                      -->
+<!-- ============================================================ -->
+<div id="auth-overlay">
+    <div class="auth-box">
+        <h3>🔐 Settings Access</h3>
+        <p>Enter the admin password to change maintenance settings</p>
+        <input type="password" id="authPassword" placeholder="Enter password..." />
+        <button class="auth-btn" onclick="authenticateUser()">Unlock Settings</button>
+        <div class="error-msg" id="authError">❌ Incorrect password. Try again.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
 <!--  ★ SETTINGS BAR (HTML) ★                                    -->
-<!--  This is the sticky bar at the very top of the page          -->
 <!-- ============================================================ -->
 <div id="site-settings">
     <div class="settings-left">
         <i class="fas fa-cog"></i>
         <span class="label">Site Settings</span>
 
-        <div class="setting-group">
+        <div class="setting-group hidden" id="maintenanceGroup">
             <span class="toggle-label"><i class="fas fa-wrench"></i> Maintenance</span>
-            <div class="toggle-switch active" id="maintenanceToggle" onclick="toggleMaintenance()">
+            <div class="toggle-switch" id="maintenanceToggle" onclick="toggleMaintenance()">
                 <div class="toggle-knob"></div>
             </div>
         </div>
 
-        <div class="setting-group">
+        <div class="setting-group hidden" id="debugGroup">
             <span class="toggle-label"><i class="fas fa-eye"></i> Debug</span>
             <div class="toggle-switch" id="debugToggle" onclick="toggleDebug()">
                 <div class="toggle-knob"></div>
@@ -821,11 +935,14 @@
     </div>
 
     <div class="settings-right">
-        <span class="status-badge maintenance" id="statusBadge">
-            <i class="fas fa-circle"></i> Maintenance
+        <span class="status-badge" id="statusBadge">
+            <i class="fas fa-circle"></i> Loading...
         </span>
         <span class="api-url" id="apiUrlDisplay">
             <i class="fas fa-link"></i> https://chrisy1011112.github.io/DIsney.inc/
+        </span>
+        <span class="lock-icon" id="lockIcon" onclick="requestAuth()">
+            <i class="fas fa-lock"></i>
         </span>
     </div>
 </div>
@@ -833,7 +950,7 @@
 <!-- ============================================================ -->
 <!--  MAIN DISNEY APP                                             -->
 <!-- ============================================================ -->
-<div class="disney-app maintenance-mode">
+<div class="disney-app" id="mainApp">
 
     <!-- header -->
     <h1 class="main-title">
@@ -1003,7 +1120,14 @@ end
 <!-- ============================================================ -->
 <script>
     (function() {
-        // ---- DATA ----
+        // ============================================================
+        // ★ CONFIGURATION ★
+        // ============================================================
+        const ADMIN_PASSWORD = 'disney2026'; // CHANGE THIS PASSWORD
+
+        // ============================================================
+        // ★ DATA ★
+        // ============================================================
         const movies = [
             { title: 'The Lion King', icon: 'fa-crown', year: '1994', tag: 'Hakuna Matata' },
             { title: 'Frozen', icon: 'fa-snowflake', year: '2013', tag: 'Let it go' },
@@ -1026,7 +1150,30 @@ end
             { name: 'Belle', icon: 'fa-book', movie: 'Beauty & Beast' },
         ];
 
-        // ---- RENDER MOVIES ----
+        // ============================================================
+        // ★ PERSISTENT STATE (localStorage) ★
+        // ============================================================
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('disneyMaintenanceState');
+                if (saved !== null) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {}
+            return { maintenance: true, authorized: false }; // default: maintenance ON
+        }
+
+        function saveState(state) {
+            try {
+                localStorage.setItem('disneyMaintenanceState', JSON.stringify(state));
+            } catch (e) {}
+        }
+
+        let state = loadState();
+
+        // ============================================================
+        // ★ RENDER CONTENT ★
+        // ============================================================
         const movieGrid = document.getElementById('movieGrid');
         if (movieGrid) {
             movieGrid.innerHTML = movies.map(m => `
@@ -1039,7 +1186,6 @@ end
             `).join('');
         }
 
-        // ---- RENDER CHARACTERS ----
         const charCarousel = document.getElementById('charCarousel');
         if (charCarousel) {
             charCarousel.innerHTML = characters.map(c => `
@@ -1051,7 +1197,9 @@ end
             `).join('');
         }
 
-        // ---- COPY FUNCTION ----
+        // ============================================================
+        // ★ COPY FUNCTION ★
+        // ============================================================
         window.copyCode = function(elementId) {
             const element = document.getElementById(elementId);
             if (!element) return;
@@ -1083,7 +1231,9 @@ end
             document.body.removeChild(textarea);
         }
 
-        // ---- TAB SWITCHING ----
+        // ============================================================
+        // ★ TAB SWITCHING ★
+        // ============================================================
         const pages = {
             home: document.getElementById('page-home'),
             movies: document.getElementById('page-movies'),
@@ -1113,22 +1263,31 @@ end
 
         if (!pages.home.classList.contains('active-page')) showPage('home');
 
-        // ---- SETTINGS: MAINTENANCE TOGGLE ----
-        let maintenanceMode = true; // STARTS IN MAINTENANCE MODE (set to false to start online)
-        const maintenanceToggle = document.getElementById('maintenanceToggle');
+        // ============================================================
+        // ★ MAINTENANCE SYSTEM ★
+        // ============================================================
         const maintenanceOverlay = document.getElementById('maintenance-overlay');
+        const maintenanceToggle = document.getElementById('maintenanceToggle');
         const statusBadge = document.getElementById('statusBadge');
-        const appContainer = document.querySelector('.disney-app');
+        const appContainer = document.getElementById('mainApp');
+        const maintenanceGroup = document.getElementById('maintenanceGroup');
+        const debugGroup = document.getElementById('debugGroup');
+        const lockIcon = document.getElementById('lockIcon');
 
-        window.toggleMaintenance = function() {
-            maintenanceMode = !maintenanceMode;
-            maintenanceToggle.classList.toggle('active', maintenanceMode);
-            if (maintenanceMode) {
+        // ---- UPDATE UI based on state ----
+        function updateMaintenanceUI() {
+            const isMaintenance = state.maintenance;
+            
+            // Toggle switch
+            maintenanceToggle.classList.toggle('active', isMaintenance);
+            
+            // Overlay
+            if (isMaintenance) {
                 maintenanceOverlay.classList.add('active');
                 statusBadge.className = 'status-badge maintenance';
                 statusBadge.innerHTML = '<i class="fas fa-circle"></i> Maintenance';
                 appContainer.classList.add('maintenance-mode');
-                // set ETA
+                // Set ETA
                 const eta = document.getElementById('maintenance-eta');
                 const now = new Date();
                 now.setMinutes(now.getMinutes() + 15);
@@ -1139,32 +1298,97 @@ end
                 statusBadge.innerHTML = '<i class="fas fa-circle"></i> Online';
                 appContainer.classList.remove('maintenance-mode');
             }
+
+            // Show/hide settings based on authorization
+            const isAuthorized = state.authorized === true;
+            maintenanceGroup.classList.toggle('hidden', !isAuthorized);
+            debugGroup.classList.toggle('hidden', !isAuthorized);
+            lockIcon.innerHTML = isAuthorized ? '<i class="fas fa-lock-open"></i>' : '<i class="fas fa-lock"></i>';
+        }
+
+        // ---- TOGGLE MAINTENANCE (only if authorized) ----
+        window.toggleMaintenance = function() {
+            if (!state.authorized) {
+                requestAuth();
+                return;
+            }
+            state.maintenance = !state.maintenance;
+            saveState(state);
+            updateMaintenanceUI();
         };
 
-        // ---- SETTINGS: DEBUG TOGGLE ----
+        // ---- TOGGLE DEBUG ----
         let debugMode = false;
         const debugToggle = document.getElementById('debugToggle');
 
         window.toggleDebug = function() {
+            if (!state.authorized) {
+                requestAuth();
+                return;
+            }
             debugMode = !debugMode;
             debugToggle.classList.toggle('active', debugMode);
             if (debugMode) {
-                console.log('🐞 Debug mode ENABLED — showing extra logs');
-                console.log('📦 Movies data:', movies);
-                console.log('👥 Characters data:', characters);
-                alert('🐞 Debug mode enabled! Check the browser console for data.');
+                console.log('🐞 Debug mode ENABLED');
+                console.log('📦 Movies:', movies);
+                console.log('👥 Characters:', characters);
+                alert('🐞 Debug mode enabled! Check console.');
             } else {
                 console.log('🐞 Debug mode disabled');
             }
         };
 
-        // ---- SIMULATED API ----
-        console.log('✨ Disney API ready for Roblox!');
-        console.log('📡 Endpoints:');
-        console.log('  /api/movies      - GET all movies');
-        console.log('  /api/characters  - GET all characters');
-        console.log('  /api/magic       - GET/POST magic counter');
-        console.log('🔗 Use your GitHub Pages URL in Roblox HttpService');
+        // ---- AUTH SYSTEM ----
+        const authOverlay = document.getElementById('auth-overlay');
+        const authInput = document.getElementById('authPassword');
+        const authError = document.getElementById('authError');
+
+        window.requestAuth = function() {
+            if (state.authorized) {
+                // If already authorized, log out
+                state.authorized = false;
+                saveState(state);
+                updateMaintenanceUI();
+                alert('🔒 Settings locked again.');
+                return;
+            }
+            authOverlay.classList.add('active');
+            authInput.value = '';
+            authError.classList.remove('show');
+            authInput.focus();
+        };
+
+        window.authenticateUser = function() {
+            const password = authInput.value.trim();
+            if (password === ADMIN_PASSWORD) {
+                state.authorized = true;
+                saveState(state);
+                authOverlay.classList.remove('active');
+                updateMaintenanceUI();
+                alert('🔓 Settings unlocked! You can now change maintenance mode.');
+            } else {
+                authError.classList.add('show');
+                authInput.value = '';
+                authInput.focus();
+            }
+        };
+
+        // Enter key on password field
+        authInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                authenticateUser();
+            }
+        });
+
+        // Click outside to close auth
+        authOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                authOverlay.classList.remove('active');
+            }
+        });
+
+        // ---- INITIALIZE ----
+        updateMaintenanceUI();
 
         // ---- UPDATE API URL DISPLAY ----
         const apiUrlDisplay = document.getElementById('apiUrlDisplay');
@@ -1173,14 +1397,9 @@ end
             apiUrlDisplay.innerHTML = `<i class="fas fa-link"></i> ${currentUrl}`;
         }
 
-        // ---- INITIAL MAINTENANCE STATE ----
-        // Since we start in maintenance mode, set the ETA
-        const eta = document.getElementById('maintenance-eta');
-        if (eta && maintenanceMode) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 15);
-            eta.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
+        console.log('✨ Disney API ready for Roblox!');
+        console.log('🔒 Maintenance mode:', state.maintenance ? 'ON' : 'OFF');
+        console.log('🔑 Authorized:', state.authorized ? 'YES' : 'NO');
 
     })();
 </script>
